@@ -1,9 +1,14 @@
-param vnet_cidr string
-param dnsSubnet_cidr string
-param vmSubnet_cidr string
-param appServiceEndpointSubnet_cidr string
 param vwan_id string
+param vnet_cidr string
 param hub_cidr string
+param dnsServer_host_number int
+param subnets array
+param subnet_indexes object
+
+// works for a /24 or other prefixes ending in a .0
+// it's a cludge, but there's no cidrhost() in Bicep
+var dnsServer_network = split(subnets[subnet_indexes.dnsSubnet].addressPrefix, '/')[0]
+var dnsServer_ip = '${split(dnsServer_network, '.')[0]}.${split(dnsServer_network, '.')[1]}.${split(dnsServer_network, '.')[2]}.${dnsServer_host_number}'
 
 resource virtualHub 'Microsoft.Network/virtualHubs@2021-02-01' = {
   name: '${resourceGroup().name}-hub'
@@ -41,45 +46,24 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-02-01' = {
   name: '${resourceGroup().name}-vnet'
   location: resourceGroup().location
   properties: {
+    dhcpOptions: {
+      dnsServers: [
+        dnsServer_ip
+        '168.63.129.16'
+      ]
+    }
     addressSpace: {
       addressPrefixes: [
         vnet_cidr
       ]
     }
+    subnets: [for subnet in subnets: {
+      name: subnet.name
+      properties: {
+        addressPrefix: subnet.addressPrefix
+      }
+    }]
   }
 }
 
-resource dnsSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
-  parent: virtualNetwork
-  name: 'dns-subnet'
-  properties: {
-    addressPrefix: dnsSubnet_cidr
-    privateEndpointNetworkPolicies: 'Disabled'
-  }
-}
-
-resource vmSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
-  parent: virtualNetwork
-  name: 'vm-subnet'
-  properties: {
-    addressPrefix: vmSubnet_cidr
-    privateEndpointNetworkPolicies: 'Disabled'
-  }
-}
-
-resource appServiceEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-06-01' = {
-  parent: virtualNetwork
-  name: 'appservice-endpoint-subnet'
-  dependsOn: [
-    vmSubnet
-  ]
-  properties: {
-    addressPrefix: appServiceEndpointSubnet_cidr
-    delegations: []
-    privateEndpointNetworkPolicies: 'Disabled'
-  }
-}
-
-output appServiceEndpointSubnet_id string = appServiceEndpointSubnet.id
-output dnsSubnet_id string = dnsSubnet.id
-output dnsSubnet_prefix string = dnsSubnet.properties.addressPrefix
+output subnets array = virtualNetwork.properties.subnets

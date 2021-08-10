@@ -25,16 +25,35 @@ resource centralusWebRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: 'centralus'
 }
 
+var subnet_indexes = {
+  vmSubnet: 0
+  appServiceEndpointSubnet: 1
+  dnsSubnet: 2
+}
+
 module eastus2Net './modules/regionalNetwork.bicep' = {
   name: 'eastus2Net'
   scope: eastus2NetRg
   params: {
-    vnet_cidr: '10.1.0.0/16'
-    dnsSubnet_cidr: '10.1.255.0/24'
-    vmSubnet_cidr: '10.1.1.0/24'
-    appServiceEndpointSubnet_cidr: '10.1.2.0/24'
     vwan_id: vwan.outputs.vwan_id
+    vnet_cidr: '10.1.0.0/16'
     hub_cidr: '10.255.1.0/24'
+    dnsServer_host_number: 5
+    subnets: [
+      {
+        name: 'vm-subnet'
+        addressPrefix: '10.1.0.0/24'
+      }
+      {
+        name: 'appservice-endpoint-subnet'
+        addressPrefix: '10.1.1.0/24'
+      }
+      {
+        name: 'dns-subnet'
+        addressPrefix: '10.1.255.0/24'
+      }
+    ]
+    subnet_indexes: subnet_indexes
   }
 }
 
@@ -42,12 +61,25 @@ module centralusNet './modules/regionalNetwork.bicep' = {
   name: 'centralusNet'
   scope: centralusNetRg
   params: {
-    vnet_cidr: '10.2.0.0/16'
-    dnsSubnet_cidr: '10.2.255.0/24'
-    vmSubnet_cidr: '10.2.1.0/24'
-    appServiceEndpointSubnet_cidr: '10.2.2.0/24'
     vwan_id: vwan.outputs.vwan_id
+    vnet_cidr: '10.2.0.0/16'
     hub_cidr: '10.255.2.0/24'
+    dnsServer_host_number: 5
+    subnets: [
+      {
+        name: 'vm-subnet'
+        addressPrefix: '10.2.0.0/24'
+      }
+      {
+        name: 'appservice-endpoint-subnet'
+        addressPrefix: '10.2.1.0/24'
+      }
+      {
+        name: 'dns-subnet'
+        addressPrefix: '10.2.255.0/24'
+      }
+    ]
+    subnet_indexes: subnet_indexes
   }
 }
 
@@ -61,7 +93,7 @@ module eastus2WebApp './modules/webapp.bicep' = {
   name: 'eastus2WebApp'
   scope: eastus2WebRg
   params: {
-    subnet_id: eastus2Net.outputs.appServiceEndpointSubnet_id
+    subnet_id: eastus2Net.outputs.subnets[subnet_indexes.appServiceEndpointSubnet].id
   }
 }
 
@@ -69,7 +101,7 @@ module centralusWebApp './modules/webapp.bicep' = {
   name: 'centralusWebApp'
   scope: centralusWebRg
   params: {
-    subnet_id: centralusNet.outputs.appServiceEndpointSubnet_id
+    subnet_id: centralusNet.outputs.subnets[subnet_indexes.appServiceEndpointSubnet].id
   }
 }
 
@@ -77,8 +109,8 @@ module eastus2DnsVm './modules/dns.bicep' = {
   name: 'eastus2DnsVm'
   scope: eastus2NetRg
   params: {
-    subnet_id: eastus2Net.outputs.dnsSubnet_id
-    subnet_prefix: eastus2Net.outputs.dnsSubnet_prefix
+    subnet_id: eastus2Net.outputs.subnets[subnet_indexes.dnsSubnet].id
+    subnet_prefix: eastus2Net.outputs.subnets[subnet_indexes.dnsSubnet].properties.addressPrefix
     vm_name: 'dns01'
     vm_host_number: 5
   }
@@ -88,9 +120,9 @@ module centralusDnsVm './modules/dns.bicep' = {
   name: 'centralusDnsVm'
   scope: centralusNetRg
   params: {
-    subnet_id: centralusNet.outputs.dnsSubnet_id
+    subnet_id: centralusNet.outputs.subnets[subnet_indexes.dnsSubnet].id
+    subnet_prefix: centralusNet.outputs.subnets[subnet_indexes.dnsSubnet].properties.addressPrefix
     vm_name: 'dns01'
-    subnet_prefix: centralusNet.outputs.dnsSubnet_prefix
     vm_host_number: 5
   }
 }
