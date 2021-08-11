@@ -1,7 +1,6 @@
 param vm_name string
 param subnet_id string
-param vm_host_number int = 256
-param subnet_prefix string = ''
+param vm_privateIpAddress string = ''
 
 module dummyVm './ubuntuVm.bicep' = {
   name: 'dummyVm'
@@ -9,6 +8,7 @@ module dummyVm './ubuntuVm.bicep' = {
   params: {
     subnet_id: subnet_id
     vm_name: vm_name
+    vm_privateIpAddress: vm_privateIpAddress
     customData: ''
     enable_public_ip: true
     asg_id: asg.id

@@ -1,12 +1,23 @@
 param vm_name string
+param vm_privateIpAddress string = ''
+param vm_dnsServers array = []
 param subnet_id string
-param vm_host_number int
-param subnet_prefix string
+param asg_id string
+param customData string
+param enable_public_ip bool
 
-// works for a /24 or other prefixes ending in a .0
-// it's a cludge, but there's no cidrhost() in Bicep
-var network = split(subnet_prefix, '/')[0]
-var private_ip = '${split(network, '.')[0]}.${split(network, '.')[1]}.${split(network, '.')[2]}.${vm_host_number}'
+resource publicIp 'Microsoft.Network/publicIPAddresses@2021-02-01' = if (enable_public_ip) {
+  name: '${vm_name}-pip'
+  location: resourceGroup().location
+
+  sku: {
+    name: 'Standard'
+    tier: 'Regional'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+  }
+}
 
 resource vmNic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
   name: '${vm_name}-nic'
@@ -16,19 +27,24 @@ resource vmNic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
       {
         name: 'ipconfig'
         properties: {
+          applicationSecurityGroups: [
+            {
+              id: asg_id
+            }
+          ]
           subnet: {
             id: subnet_id
           }
-          privateIPAllocationMethod: 'Static'
-
-          privateIPAddress: private_ip
+          privateIPAllocationMethod: vm_privateIpAddress == '' ? 'Dynamic' : 'Static'
+          privateIPAddress: vm_privateIpAddress == '' ? null : vm_privateIpAddress
+          publicIPAddress: enable_public_ip ? {
+            id: publicIp.id
+          } : null
         }
       }
     ]
     dnsSettings: {
-      dnsServers: [
-        '168.63.129.16'
-      ]
+      dnsServers: vm_dnsServers
     }
   }
 }
@@ -64,7 +80,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-03-01' = {
     osProfile: {
       computerName: vm_name
       adminUsername: 'jdelisle'
-      customData: loadFileAsBase64('./cloudinit.conf')
+      customData: customData != '' ? customData : null
       linuxConfiguration: {
         disablePasswordAuthentication: true
         ssh: {
@@ -85,3 +101,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-03-01' = {
     }
   }
 }
+
+output publicIpAddress string = enable_public_ip ? publicIp.properties.ipAddress : ''
+output privateIpAddress string = vmNic.properties.ipConfigurations[0].properties.privateIPAddress

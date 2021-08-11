@@ -1,4 +1,5 @@
 param subnet_id string
+param dnsServer_ipAddress string
 
 resource serverFarm 'Microsoft.Web/serverfarms@2021-01-15' = {
   name: '${resourceGroup().name}-asp'
@@ -27,7 +28,7 @@ resource appSettings 'Microsoft.Web/sites/config@2021-01-15' = {
   parent: webApp
   name: 'appsettings'
   properties: {
-    WEBSITE_DNS_SERVER: '168.63.129.16'
+    WEBSITE_DNS_SERVER: dnsServer_ipAddress
     WEBSITE_VNET_ROUTE_ALL: '1'
   }
 }

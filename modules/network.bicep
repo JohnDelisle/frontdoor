@@ -1,14 +1,8 @@
 param vwan_id string
 param vnet_cidr string
 param hub_cidr string
-param dnsServer_host_number int
+param dnsServer_privateIpAddress string
 param subnets array
-param subnet_indexes object
-
-// works for a /24 or other prefixes ending in a .0
-// it's a cludge, but there's no cidrhost() in Bicep
-var dnsServer_network = split(subnets[subnet_indexes.dnsSubnet].addressPrefix, '/')[0]
-var dnsServer_ip = '${split(dnsServer_network, '.')[0]}.${split(dnsServer_network, '.')[1]}.${split(dnsServer_network, '.')[2]}.${dnsServer_host_number}'
 
 resource virtualHub 'Microsoft.Network/virtualHubs@2021-02-01' = {
   name: '${resourceGroup().name}-hub'
@@ -48,7 +42,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-02-01' = {
   properties: {
     dhcpOptions: {
       dnsServers: [
-        dnsServer_ip
+        dnsServer_privateIpAddress
         '168.63.129.16'
       ]
     }
@@ -61,6 +55,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-02-01' = {
       name: subnet.name
       properties: {
         addressPrefix: subnet.addressPrefix
+        privateEndpointNetworkPolicies: contains(subnet, 'privateEndpointNetworkPolicies') ? subnet.privateEndpointNetworkPolicies : null
       }
     }]
   }
