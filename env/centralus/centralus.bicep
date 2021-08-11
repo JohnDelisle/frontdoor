@@ -1,8 +1,8 @@
-param vwan_id string = '/subscriptions/d7c0f56a-558e-46e3-bbbb-2c733b72f3d8/resourceGroups/app508-jmdpe3-vwan-nr/providers/Microsoft.Network/virtualWans/app508-jmdpe3-vwan-nr-vwan'
+param version int = 4
+param vwan_id string = '/subscriptions/d7c0f56a-558e-46e3-bbbb-2c733b72f3d8/resourceGroups/app508-jmdpe${version}-vwan-nr/providers/Microsoft.Network/virtualWans/app508-jmdpe${version}-vwan-nr-vwan'
 
 targetScope = 'subscription'
 
-var version = 4
 var location = 'centralus'
 var subnet_indexes = {
   vmSubnet: 0
