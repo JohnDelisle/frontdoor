@@ -1,9 +1,10 @@
 param vm_name string
+param location string
 param subnet_id string
 param vm_privateIpAddress string = ''
 
-module dummyVm './ubuntuVm.bicep' = {
-  name: 'dummyVm'
+module dummyUbuntuVm './ubuntuVm.bicep' = {
+  name: '${location}-dummyUbuntuVm'
   scope: resourceGroup()
   params: {
     subnet_id: subnet_id
@@ -12,6 +13,7 @@ module dummyVm './ubuntuVm.bicep' = {
     customData: ''
     enable_public_ip: true
     asg_id: asg.id
+    nsg_id: nsg.id
   }
 }
 
@@ -46,5 +48,5 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
   }
 }
 
-output publicIpAddress string = dummyVm.outputs.publicIpAddress
-output privateIpAddress string = dummyVm.outputs.privateIpAddress
+output publicIpAddress string = dummyUbuntuVm.outputs.publicIpAddress
+output privateIpAddress string = dummyUbuntuVm.outputs.privateIpAddress

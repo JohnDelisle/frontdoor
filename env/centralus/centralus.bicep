@@ -1,8 +1,8 @@
-param vwan_id string
+param vwan_id string = '/subscriptions/d7c0f56a-558e-46e3-bbbb-2c733b72f3d8/resourceGroups/app508-jmdpe3-vwan-nr/providers/Microsoft.Network/virtualWans/app508-jmdpe3-vwan-nr-vwan'
 
 targetScope = 'subscription'
 
-var version = 3
+var version = 4
 var location = 'centralus'
 var subnet_indexes = {
   vmSubnet: 0
@@ -25,9 +25,11 @@ var subnets = [
   }
 ]
 var dnsServer_privateIpAddress = '10.2.255.5'
+var vnet_cidr = '10.2.0.0/16'
+var hub_cidr = '10.255.2.0/24'
 
 module regionalEnvironment '../../modules/regionalEnvironment.bicep' = {
-  name: 'regionalEnvironment'
+  name: '${location}-regionalEnvironment'
   params: {
     version: version
     location: location
@@ -35,5 +37,10 @@ module regionalEnvironment '../../modules/regionalEnvironment.bicep' = {
     subnet_indexes: subnet_indexes
     dnsServer_privateIpAddress: dnsServer_privateIpAddress
     vwan_id: vwan_id
+    vnet_cidr: vnet_cidr
+    hub_cidr: hub_cidr
   }
 }
+
+output dnsVm_ipAddresses object = regionalEnvironment.outputs.dnsVm_ipAddresses
+output dummyVm_ipAddresses object = regionalEnvironment.outputs.dummyVm_ipAddresses

@@ -1,9 +1,10 @@
+param location string
 param vm_name string
 param subnet_id string
 param vm_privateIpAddress string = ''
 
-module dnsVm './ubuntuVm.bicep' = {
-  name: 'dnsVm'
+module dnsUbuntuVm './ubuntuVm.bicep' = {
+  name: '${location}-dnsUbuntuVm'
   scope: resourceGroup()
   params: {
     subnet_id: subnet_id
@@ -12,9 +13,10 @@ module dnsVm './ubuntuVm.bicep' = {
     vm_dnsServers: [
       '168.63.129.16'
     ]
-    customData: loadFileAsBase64('./cloudinit.conf')
+    customData: loadFileAsBase64('./cloudinit.yml')
     enable_public_ip: false
     asg_id: asg.id
+    nsg_id: nsg.id
   }
 }
 
@@ -83,5 +85,5 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
   }
 }
 
-output publicIpAddress string = dnsVm.outputs.publicIpAddress
-output privateIpAddress string = dnsVm.outputs.privateIpAddress
+output publicIpAddress string = dnsUbuntuVm.outputs.publicIpAddress
+output privateIpAddress string = dnsUbuntuVm.outputs.privateIpAddress

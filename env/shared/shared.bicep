@@ -1,11 +1,13 @@
 targetScope = 'subscription'
 
-var version = 3
+var version = 4
+var location = 'eastus2'
 
 module vwan '../../modules/sharedVwan.bicep' = {
-  name: 'sharedVwan'
+  name: '${location}-sharedVwan'
   params: {
     version: version
+    location: location
   }
 }
 

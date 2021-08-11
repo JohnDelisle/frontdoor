@@ -3,6 +3,7 @@ param vm_privateIpAddress string = ''
 param vm_dnsServers array = []
 param subnet_id string
 param asg_id string
+param nsg_id string
 param customData string
 param enable_public_ip bool
 
@@ -23,6 +24,9 @@ resource vmNic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
   name: '${vm_name}-nic'
   location: resourceGroup().location
   properties: {
+    networkSecurityGroup: {
+      id: nsg_id
+    }
     ipConfigurations: [
       {
         name: 'ipconfig'
