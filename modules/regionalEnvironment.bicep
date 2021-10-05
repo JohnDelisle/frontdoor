@@ -8,14 +8,15 @@ param subnet_indexes object
 param version int
 param vnet_cidr string
 param hub_cidr string
+param rgPrefix string
 
 resource netRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'app508-jmdpe${version}-net-${location}'
+  name: '${rgPrefix}${version}-net-${location}'
   location: location
 }
 
 resource webRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'app508-jmdpe${version}-web-${location}'
+  name: '${rgPrefix}${version}-web-${location}'
   location: location
 }
 

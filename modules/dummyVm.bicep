@@ -44,6 +44,28 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
           access: 'Allow'
         }
       }
+      {
+        name: 'permit-80-443'
+        properties: {
+          priority: 300
+          direction: 'Outbound'
+          protocol: 'Tcp'
+          sourceApplicationSecurityGroups: [
+            {
+              id: asg.id
+            }
+          ]
+          sourcePortRange: '*'
+          destinationAddressPrefixes: [
+            '10.0.0.0/8'
+          ]
+          destinationPortRanges: [
+            '80'
+            '443'
+          ]
+          access: 'Allow'
+        }
+      }
     ]
   }
 }

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<publishData>
+  <publishProfile profileName="app508-jmdpe10-web-eastus2-app - Web Deploy" publishMethod="MSDeploy" publishUrl="app508-jmdpe10-web-eastus2-app.scm.azurewebsites.net:443" msdeploySite="app508-jmdpe10-web-eastus2-app" userName="$app508-jmdpe10-web-eastus2-app" userPWD="wcPCGEk8GSC28rsdusCQn2KeGu7KBdPoWSiudpw5GAhampvmlk8YouiEvX6c" destinationAppUrl="http://app508-jmdpe10-web-eastus2-app.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="http://windows.azure.com" webSystem="WebSites">
+    <databases />
+  </publishProfile>
+  <publishProfile profileName="app508-jmdpe10-web-eastus2-app - FTP" publishMethod="FTP" publishUrl="ftp://waws-prod-bn1-111.ftp.azurewebsites.windows.net/site/wwwroot" ftpPassiveMode="True" userName="app508-jmdpe10-web-eastus2-app\$app508-jmdpe10-web-eastus2-app" userPWD="wcPCGEk8GSC28rsdusCQn2KeGu7KBdPoWSiudpw5GAhampvmlk8YouiEvX6c" destinationAppUrl="http://app508-jmdpe10-web-eastus2-app.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="http://windows.azure.com" webSystem="WebSites">
+    <databases />
+  </publishProfile>
+  <publishProfile profileName="app508-jmdpe10-web-eastus2-app - Zip Deploy" publishMethod="ZipDeploy" publishUrl="app508-jmdpe10-web-eastus2-app.scm.azurewebsites.net:443" userName="$app508-jmdpe10-web-eastus2-app" userPWD="wcPCGEk8GSC28rsdusCQn2KeGu7KBdPoWSiudpw5GAhampvmlk8YouiEvX6c" destinationAppUrl="http://app508-jmdpe10-web-eastus2-app.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="http://windows.azure.com" webSystem="WebSites">
+    <databases />
+  </publishProfile>
+</publishData>

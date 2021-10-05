@@ -12,27 +12,44 @@ resource virtualHub 'Microsoft.Network/virtualHubs@2021-02-01' = {
     virtualWan: {
       id: vwan_id
     }
+    allowBranchToBranchTraffic: true
   }
 }
 
 resource virtualHubConnection 'Microsoft.Network/virtualHubs/hubVirtualNetworkConnections@2021-02-01' = {
   name: '${virtualHub.name}/${virtualNetwork.name}-con'
+  dependsOn: [
+    virtualHub
+    virtualNetwork
+  ]
   properties: {
+    allowHubToRemoteVnetTransit: true
+    allowRemoteVnetToUseHubVnetGateways: true
+    enableInternetSecurity: false
+
     remoteVirtualNetwork: {
       id: virtualNetwork.id
     }
+    /*
     routingConfiguration: {
+
       associatedRouteTable: {
         id: '${virtualHub.id}/hubRouteTables/defaultRouteTable'
       }
       propagatedRouteTables: {
-        ids: [
+        /*ids: [
           {
             id: '${virtualHub.id}/hubRouteTables/defaultRouteTable'
           }
+        ]*/
+
+    /*
+        labels: [
+          'default'
         ]
       }
     }
+    */
   }
 }
 
